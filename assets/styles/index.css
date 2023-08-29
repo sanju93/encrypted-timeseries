@@ -1,0 +1,14 @@
+#container{
+  height: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#container div{
+    height: 150px;
+    width : 49%;
+    border : 1px solid black;
+    padding-left: 0.5%;
+}
