@@ -1,14 +1,11 @@
 const express = require("express");
 const app = express();
-require('dotenv').config();
-const io = require("socket.io")(process.env.socketPort || 8000, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT"],
-    allowHeaders: ["content-type"],
-  },
-});
+require("dotenv").config();
+let http = require("http").Server(app);
+const io = require("socket.io")(http);
 let crypto = require("crypto");
+
+const port = process.env.port || 8000;
 
 let data = require("./data.json");
 require("./config/mongoose");
@@ -60,7 +57,7 @@ io.on("connection", async (socket) => {
     }
 
     socket.emit("send", { encrypt: send });
-  }, 1000);
+  }, 1000 * 10);
 
   socket.on("send_back", async (message) => {
     let DecryptData = [];
@@ -70,7 +67,7 @@ io.on("connection", async (socket) => {
 
     let temp = JSON.parse(decrypt);
 
-    socket.emit("data",temp);
+    //  socket.emit("data",temp);
 
     try {
       let user = await Data.findOne({ name: temp.name });
@@ -86,7 +83,22 @@ io.on("connection", async (socket) => {
     }
   });
 
- 
+  try {
+    let user = await Data.find({});
+    for (let i = 0; i < user.length; i++) {
+      socket.emit("data", {
+        name: user[i].name,
+        city: user[i].city,
+        secret_key: user[i].secret_key,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+
+  socket.on("disconnect", () => {
+    console.log("disconnected");
+  });
 });
 
 app.use(express.static("./assets"));
@@ -99,14 +111,10 @@ app.get("/", (req, res) => {
   return res.render("index");
 });
 
-app.get("/decrypt/:data", (req, res) => {
-  let encrypted = req.params.data;
-});
-
-app.listen(process.env.port || 8001, function (err) {
+http.listen(port, function (err) {
   if (err) {
     console.log(err);
   }
 
-  console.log("Server running on port:", 8001);
+  console.log("Server running on port:", port);
 });

@@ -25,8 +25,10 @@ socket.on("data",message => {
     child.appendChild(secret_key);
     div.appendChild(child);
 
-    console.log(message);
+    
 })
+
+
 
 
 
