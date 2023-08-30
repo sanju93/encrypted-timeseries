@@ -1,4 +1,4 @@
-var socket = io('http://localhost:8000');
+var socket = io("https://encrypted-timeseries-0eyn.onrender.com/");
 
 let div = document.getElementById("container");
 
